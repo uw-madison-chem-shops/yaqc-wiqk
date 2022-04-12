@@ -1,0 +1,48 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "yaqc_wiqk"
+dist-name = "yaqc-wiqk"
+author = "Blaise Thompson"
+author-email = "blaise.thompson@wisc.edu"
+home-page = "https://github.com/uw-madison-chem-shops/yaqc-wiqk"
+classifiers = ["License :: OSI Approved :: MIT License"]
+requires-python = ">=3.7"
+requires = ["appdirs",
+            "attune",
+            "click",
+            "numexpr",
+	    "pyqtgraph",
+	    "pyside2",
+	    "pyserial",
+	    "qtpy",
+	    "slackclient<2",
+	    "slacker",
+	    "sympy",
+	    "toml",
+	    "wrighttools",
+	    "yaqc",
+	    ]
+
+[tool.flit.scripts]
+yaqc-wiqk = "yaqc_wiqk.__main__:main"
+
+[tool.black]
+line-length = 99
+target-version = ['py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | build
+  | dist
+)/
+'''
