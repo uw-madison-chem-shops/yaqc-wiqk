@@ -1,4 +1,7 @@
-def run(flow_rate, reaction_time):
+# continuous flow
+
+
+def run(flow_rate):
     # Median exit times (i.e., exit time for CONTINUOUS FLOW) needed to determine collection valve timing
     # 50mL/min, 0.833 mL/sec, tmed = 10.6 sec
     # 40mL/min, 0.5 mL/sec, tmed =  12.8 sec

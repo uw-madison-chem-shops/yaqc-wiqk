@@ -1,26 +1,26 @@
-# Mean residence time needed to place middle of plug in middle of rxn zone before rxn delay
-# 50mL/min, 0.833 mL/sec, tm = 2.06 sec
-# 40mL/min, 0.5 mL/sec, tm = 2.65 sec
-# 30mL/min, 0.5 mL/sec, tm = 3.72 sec
-# 20mL/min, 0.833 mL/sec, tm = 6.8 sec
-# 10mL/min, 0.833 mL/sec, tm = 12.9 sec
-
-
-# Median exit times (i.e., exit time for STOPPED FLOW, supposed to account for pump
-# acceleration/deceleration) needed to determine collection valve timing
-# Updated 01.04.2022
-
-# 50mL/min, 0.833 mL/sec, tmed = 12.4 sec
-# 40mL/min, 0.5 mL/sec, tmed =  14.2
-# 30mL/min, 0.5 mL/sec, tmed = 17.6 sec (not updated, using 18.2 as guess)
-# 20mL/min, 0.5 mL/sec, tmed = 25.5 (not updated)
-# 10mL/min, 0.5 mL/sec, tmed = 49 sec (not updated)
-
-import yaqc
-import time
+# stopped flow
 
 
 def run(flow_rate, reaction_time):
+    # Mean residence time needed to place middle of plug in middle of rxn zone before rxn delay
+    # 50mL/min, 0.833 mL/sec, tm = 2.06 sec
+    # 40mL/min, 0.5 mL/sec, tm = 2.65 sec
+    # 30mL/min, 0.5 mL/sec, tm = 3.72 sec
+    # 20mL/min, 0.833 mL/sec, tm = 6.8 sec
+    # 10mL/min, 0.833 mL/sec, tm = 12.9 sec
+
+    # Median exit times (i.e., exit time for STOPPED FLOW, supposed to account for pump
+    # acceleration/deceleration) needed to determine collection valve timing
+    # Updated 01.04.2022
+
+    # 50mL/min, 0.833 mL/sec, tmed = 12.4 sec
+    # 40mL/min, 0.5 mL/sec, tmed =  14.2
+    # 30mL/min, 0.5 mL/sec, tmed = 17.6 sec (not updated, using 18.2 as guess)
+    # 20mL/min, 0.5 mL/sec, tmed = 25.5 (not updated)
+    # 10mL/min, 0.5 mL/sec, tmed = 49 sec (not updated)
+
+    import yaqc
+    import time
 
     # define variables to determine collection window rxn time, and pump timing
     mean_residence_time = 6.8
