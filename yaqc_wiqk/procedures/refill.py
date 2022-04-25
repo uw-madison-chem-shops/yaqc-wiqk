@@ -1,12 +1,15 @@
 # refill
 
 
+import time
+import yaqc
+
+from .._pump import *
+
+
 def run():
     # Refill DSPs
     # (all volumes in mL unless specified differently)
-    import yaqc
-    import time
-    import wiqk
 
     if True:
         print("refill")
@@ -25,9 +28,9 @@ def run():
     valve1 = yaqc.Client(36001)
     valve2 = yaqc.Client(36002)
     valve3 = yaqc.Client(36003)
-    p1 = wiqk.Pump(1)
-    p2 = wiqk.Pump(2)
-    p3 = wiqk.Pump(4)
+    p1 = Pump(1)
+    p2 = Pump(2)
+    p3 = Pump(4)
 
     # Pump Injection Volume for rxn/refill
     p1_rxn_inj = 2.5 * Vsl + Veq + 0.5 * Vrxnzone + 0.333 * Vexit
@@ -94,7 +97,7 @@ def run():
     p3.add_step(volume=p3_refill_vol, rate=pall_refill_rates, delay=0)
     p3.add_step(volume=p3_extra_inj, rate=pall_refill_rates, delay=0)
 
-    wiqk.start_pumps(1, 2, 4)
+    start_pumps(1, 2, 4)
     print("Refill rate = " + str(-pall_refill_rates) + " mL/min")
     print("Volume withdraw per pump = " + str(Vtotal_1P) + " mL")
     time.sleep(pump_run_time + 1)

@@ -1,13 +1,14 @@
 # flush
 
+import time
+import yaqc
+
+from .._pump import *
+
 
 def run():
-
     # Flush
     # (all volumes in mL unless specified differently)
-    import yaqc
-    import time
-    import wiqk
 
     if True:
         print("flush")
@@ -47,9 +48,9 @@ def run():
     valve2 = yaqc.Client(36002)  # Catalyst
     valve3 = yaqc.Client(36003)  # Quench
     # Pump assignments
-    p1 = wiqk.Pump(1)  # Monomer line
-    p2 = wiqk.Pump(2)  # Catalyst line
-    p3 = wiqk.Pump(4)  # Quench line
+    p1 = Pump(1)  # Monomer line
+    p2 = Pump(2)  # Catalyst line
+    p3 = Pump(4)  # Quench line
 
     # Pump injection volume for rxn
     pall_rxn_inj = 2.5 * Vsl + Veq + 0.5 * Vrxnzone + 0.333 * Vexit
@@ -110,7 +111,7 @@ def run():
     p3.add_step(volume=pall_rxn_inj, rate=pall_flow_rates, delay=0)
     p3.add_step(volume=pall_flush_inj, rate=pall_flush_rates, delay=0)
 
-    wiqk.start_pumps(1, 2, 4)
+    start_pumps(1, 2, 4)
 
     # Collection valve timing and instructions
     time.sleep(pump_run_time / 2)

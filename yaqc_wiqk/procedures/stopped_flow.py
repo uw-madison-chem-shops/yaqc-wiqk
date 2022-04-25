@@ -1,6 +1,12 @@
 # stopped flow
 
 
+import time
+import yaqc
+
+from .._pump import *
+
+
 def run(flow_rate, reaction_time):
     # Mean residence time needed to place middle of plug in middle of rxn zone before rxn delay
     # 50mL/min, 0.833 mL/sec, tm = 2.06 sec
@@ -18,9 +24,6 @@ def run(flow_rate, reaction_time):
     # 30mL/min, 0.5 mL/sec, tmed = 17.6 sec (not updated, using 18.2 as guess)
     # 20mL/min, 0.5 mL/sec, tmed = 25.5 (not updated)
     # 10mL/min, 0.5 mL/sec, tmed = 49 sec (not updated)
-
-    import yaqc
-    import time
 
     if True:
         print("stopped flow")
@@ -146,12 +149,9 @@ def run(flow_rate, reaction_time):
 
     # Pump instructions for reaction, flush, and refill
 
-    import time
-    import wiqk
-
-    p1 = wiqk.Pump(1)
-    p2 = wiqk.Pump(2)
-    p3 = wiqk.Pump(4)
+    p1 = Pump(1)
+    p2 = Pump(2)
+    p3 = Pump(4)
 
     p1.add_step(volume=p1_rxn_inj, rate=pall_flow_rates, delay=0)
     p1.add_step(volume=s2_p1_rxn_inj, rate=pall_flow_rates, delay=p1_rxn_delay)
@@ -168,7 +168,7 @@ def run(flow_rate, reaction_time):
     p3.add_step(volume=p3_flush_inj, rate=pall_flush_rates, delay=round(p3_flush_delay))
     p3.add_step(volume=p3_refill_vol, rate=pall_refill_rates, delay=round(p3_refill_delay))
 
-    wiqk.start_pumps(1, 2, 4)
+    start_pumps(1, 2, 4)
 
     # Collection valve timing and instructions
 

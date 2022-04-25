@@ -2,6 +2,10 @@
 
 
 def run(flow_rate):
+    import time
+    import yaqc
+    from .._pump import Pump, start_pumps
+
     # Median exit times (i.e., exit time for CONTINUOUS FLOW) needed to determine collection valve timing
     # 50mL/min, 0.833 mL/sec, tmed = 10.6 sec
     # 40mL/min, 0.5 mL/sec, tmed =  12.8 sec
@@ -9,12 +13,9 @@ def run(flow_rate):
     # 20mL/min, xx mL/sec, tmed = 24.6 sec
     # 10mL/min, xx mL/sec, tmed = 48.2
 
-    import yaqc
-    import time
-
     if True:
         print("continuous flow", flow_rate)
-        for i in range(65):
+        for i in range(11):
             print(i)
             time.sleep(1)
         return
@@ -104,11 +105,10 @@ def run(flow_rate):
     # Pump instructions for reaction, flush, and refill
 
     import time
-    import wiqk
 
-    p1 = wiqk.Pump(1)
-    p2 = wiqk.Pump(2)
-    p3 = wiqk.Pump(4)
+    p1 = Pump(1)
+    p2 = Pump(2)
+    p3 = Pump(4)
 
     p1.add_step(volume=p1_rxn_inj, rate=pall_flow_rates, delay=0)
     p1.add_step(volume=p1_flush_inj, rate=pall_flush_rates, delay=round(pump_flush_delay))
@@ -124,7 +124,7 @@ def run(flow_rate):
     )
     p3.add_step(volume=p3_refill_vol, rate=pall_refill_rates, delay=round(p3_refill_delay))
 
-    wiqk.start_pumps(1, 2, 4)
+    start_pumps(1, 2, 4)
 
     # Collection valve timing and instructions
 

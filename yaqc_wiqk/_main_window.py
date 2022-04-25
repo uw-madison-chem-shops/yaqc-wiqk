@@ -3,25 +3,37 @@
 import sys
 import os
 import pathlib
-import matplotlib
 import time
+from dataclasses import dataclass
 
+import matplotlib
 from qtpy import QtWidgets, QtCore
 import appdirs
 import toml
 import yaqc
 import qtypes
 import tidy_headers
+from yaqc_qtpy import QClient
 
 from .__version__ import __version__
 from ._procedure_runner import ProcedureRunner
 from ._timestamp import TimeStamp
 from . import procedures
+from ._config import Config
 
+
+config = Config()
 
 matplotlib.use("ps")  # important - images will be generated in worker threads
 
 __here__ = pathlib.Path(os.path.abspath(__file__)).parent
+
+
+@dataclass
+class ValveData:
+    port: int
+    qclient: QClient
+    enum: qtypes.Enum
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -32,6 +44,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, config):
         super().__init__(parent=None)
         self.setWindowTitle("yaqc-wiqk")
+        self._connect_to_valves()
         self._create_main_frame()
         self._procedure_runner = ProcedureRunner(self)
         self._last_procedure_started = float("nan")
@@ -39,6 +52,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._poll_timer.timeout.connect(self._poll)
         self.procedure_started.connect(self._on_procedure_started)
         self.procedure_finished.connect(self._on_procedure_finished)
+
+    def _connect_to_valves(self):
+        self._valves = {}
+        for i in range(4):
+            port = config[f"valve{i}_port"]
+            qclient = None  # QClient(host="127.0.0.1", port=port)
+            enum = qtypes.Enum(str(i), value={"allowed": ["A", "B"]})
+            self._valves[i] = ValveData(port=port, qclient=qclient, enum=enum)
 
     def _create_main_frame(self):
         splitter = QtWidgets.QSplitter()
@@ -48,8 +69,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # valves
         heading = qtypes.Null("valves")
         self._tree_widget.append(heading)
-        for i in range(4):
-            heading.append(qtypes.Enum(str(i), value={"allowed": ["A", "B"]}))
+        for data in self._valves.values():
+            heading.append(data.enum)
         # procedures
         self._procedures_enum = qtypes.Enum(
             "procedures", value={"allowed": ["continuous flow", "stopped flow", "flush", "refill"]}
@@ -65,11 +86,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # finish ----------------------------------------------------------------------------------
         self.setCentralWidget(splitter)
         splitter.setStretchFactor(0, 1)
-        splitter.setStretchFactor(1, 50)
+        splitter.setStretchFactor(1, 2)
         self._tree_widget.expandAll()
+        self._on_procedures_enum_updated()
         self._tree_widget.resizeColumnToContents(0)
         self._tree_widget.resizeColumnToContents(1)
-        self._on_procedures_enum_updated()
 
     def _on_procedures_enum_updated(self):
         new_procedure = self._procedures_enum.get_value()
@@ -104,9 +125,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def _on_procedure_finished(self):
         print("_on_procedure_finished")
         self._poll_timer.stop()
+        self._procedures_enum.disabled.emit(False)
+        self._run_button.disabled.emit(False)
+        for obj in self._kwargs.values():
+            obj.disabled.emit(False)
 
     def _on_procedure_started(self):
         print("_on_procedure_started")
+        self._procedures_enum.disabled.emit(True)
+        self._run_button.disabled.emit(True)
+        for obj in self._kwargs.values():
+            obj.disabled.emit(True)
 
     def _on_run_button_updated(self):
         procedure = self._procedures_enum.get_value()
@@ -122,6 +151,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for k, v in self._kwargs.items():
             headers[k] = v.get_value()
         tidy_headers.write(self._data_filepath, headers)
+        self._data_filepath_widget.set_value(str(self._data_filepath))
         # start data recording
         self._poll_timer.start()
         # launch procedure
