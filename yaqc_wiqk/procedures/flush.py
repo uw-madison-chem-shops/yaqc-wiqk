@@ -9,6 +9,12 @@ def run():
     import time
     import wiqk
 
+    if True:
+        print("flush")
+        for i in range(65):
+            print(i)
+        return
+
     # pall_flow_rates is the flow rate of one DSP
 
     # FILL IN PUMP FLOW RATE BELOW

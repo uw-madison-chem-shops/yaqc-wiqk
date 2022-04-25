@@ -11,10 +11,12 @@ import appdirs
 import toml
 import yaqc
 import qtypes
+import tidy_headers
 
 from .__version__ import __version__
 from ._procedure_runner import ProcedureRunner
 from ._timestamp import TimeStamp
+from . import procedures
 
 
 matplotlib.use("ps")  # important - images will be generated in worker threads
@@ -71,25 +73,22 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _on_procedures_enum_updated(self):
         new_procedure = self._procedures_enum.get_value()
+        self._kwargs = {}
+        self._procedures_enum.clear()
         if new_procedure == "continuous flow":
-            self._procedures_enum.clear()
-            self._procedures_enum.append(qtypes.Float("flow rate (mL/min)", value={"value": 10}))
-            self._procedures_enum.append(qtypes.Float("reaction time (s)", value={"value": 60}))
-            pass
+            self._kwargs["flow_rate"] = qtypes.Float("flow rate (mL/min)", value={"value": 10})
         elif new_procedure == "stopped flow":
-            self._procedures_enum.clear()
-            self._procedures_enum.append(qtypes.Float("flow rate (mL/min)"))
-            self._procedures_enum.append(qtypes.Float("reaction time (s)"))
-
+            self._kwargs["flow_rate"] = qtypes.Float("flow rate (mL/min)", value={"value": 10})
+            self._kwargs["reaction_time"] = qtypes.Float("reaction time (s)", value={"value": 60})
         elif new_procedure == "flush":
-            self._procedures_enum.clear()
-
+            pass
         elif new_procedure == "refill":
-            self._procedures_enum.clear()
-
+            pass
         else:
             print(f"procedure {new_procedure} not recognized in _on_procedures_enum_updated")
             return
+        for obj in self._kwargs.values():
+            self._procedures_enum.append(obj)
         self._run_button = qtypes.Button("run")
         self._run_button.updated.connect(self._on_run_button_updated)
         self._procedures_enum.append(self._run_button)
@@ -115,11 +114,20 @@ class MainWindow(QtWidgets.QMainWindow):
         # make data file
         filename = TimeStamp(at=self._last_procedure_started).path + f" {procedure}.txt"
         self._data_filepath = pathlib.Path(os.path.expanduser("~")) / "WiQK-data" / filename
-        self._data_filepath_widget.set_value(str(self._data_filepath))
+        self._data_filepath.parent.mkdir(parents=True, exist_ok=True)
+        self._data_filepath.touch()
+        headers = {}
+        headers["timestamp"] = TimeStamp(at=self._last_procedure_started).RFC3339
+        headers["procedure"] = procedure
+        for k, v in self._kwargs.items():
+            headers[k] = v.get_value()
+        tidy_headers.write(self._data_filepath, headers)
         # start data recording
         self._poll_timer.start()
         # launch procedure
-        self._procedure_runner.run(None)
+        function = procedures.__dict__[procedure.lower().replace(" ", "_")]
+        kwargs = {k: v.get_value() for k, v in self._kwargs.items()}
+        self._procedure_runner.run(function, kwargs=kwargs)
 
     def _poll(self):
         minutes, seconds = divmod(time.time() - self._last_procedure_started, 60)

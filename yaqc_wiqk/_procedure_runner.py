@@ -1,17 +1,18 @@
 import time
 import threading
+import functools
 
 
 class ProcedureRunner(object):
     def __init__(self, main_window):
         self._main_window = main_window
 
-    def run(self, path):
-        def wait_10():
-            self._main_window.procedure_started.emit()
-            for i in range(120):
-                print(i)
-                time.sleep(1)
-            self._main_window.procedure_finished.emit()
+    def run(self, function, kwargs):
+        def worker(main_window, function, kwargs):
+            main_window.procedure_started.emit()
+            function(**kwargs)
+            main_window.procedure_finished.emit()
 
-        threading.Thread(target=wait_10).start()
+        partial = functools.partial(worker, self._main_window, function, kwargs)
+
+        threading.Thread(target=partial).start()

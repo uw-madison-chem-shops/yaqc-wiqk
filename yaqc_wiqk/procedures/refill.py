@@ -8,6 +8,12 @@ def run():
     import time
     import wiqk
 
+    if True:
+        print("refill")
+        for i in range(65):
+            print(i)
+        return
+
     # Reactor Volume Parameters
     Vsl = 1.94
     Veq = 0.715

@@ -12,6 +12,13 @@ def run(flow_rate):
     import yaqc
     import time
 
+    if True:
+        print("continuous flow", flow_rate)
+        for i in range(65):
+            print(i)
+            time.sleep(1)
+        return
+
     # define variables to determine collection window
     median_exit_time = 16.8
     flow_rates = flow_rate

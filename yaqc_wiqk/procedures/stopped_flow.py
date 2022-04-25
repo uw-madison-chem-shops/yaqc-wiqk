@@ -22,6 +22,12 @@ def run(flow_rate, reaction_time):
     import yaqc
     import time
 
+    if True:
+        print("stopped flow")
+        for i in range(65):
+            print(i)
+        return
+
     # define variables to determine collection window rxn time, and pump timing
     mean_residence_time = 6.8
     median_exit_time = 25.5
