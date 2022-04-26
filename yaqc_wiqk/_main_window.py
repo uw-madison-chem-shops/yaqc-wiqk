@@ -5,6 +5,7 @@ import os
 import pathlib
 import time
 from dataclasses import dataclass
+import functools
 
 import matplotlib
 from qtpy import QtWidgets, QtCore
@@ -20,6 +21,7 @@ from ._procedure_runner import ProcedureRunner
 from ._timestamp import TimeStamp
 from . import procedures
 from ._config import Config
+from ._valve import Valve
 
 
 config = Config()
@@ -27,13 +29,6 @@ config = Config()
 matplotlib.use("ps")  # important - images will be generated in worker threads
 
 __here__ = pathlib.Path(os.path.abspath(__file__)).parent
-
-
-@dataclass
-class ValveData:
-    port: int
-    qclient: QClient
-    enum: qtypes.Enum
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -57,9 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._valves = {}
         for i in range(4):
             port = config[f"valve{i}_port"]
-            qclient = None  # QClient(host="127.0.0.1", port=port)
-            enum = qtypes.Enum(str(i), value={"allowed": ["A", "B"]})
-            self._valves[i] = ValveData(port=port, qclient=qclient, enum=enum)
+            self._valves[i] = Valve(port=port, index=i)
 
     def _create_main_frame(self):
         splitter = QtWidgets.QSplitter()
