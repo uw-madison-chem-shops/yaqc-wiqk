@@ -10,42 +10,40 @@ from .._pump import *
 def run(flow_rate, reaction_time):
     # Mean residence time needed to place middle of plug in middle of rxn zone before rxn delay
     # 50mL/min, 0.833 mL/sec, tm = 2.06 sec
-    # 40mL/min, 0.5 mL/sec, tm = 2.65 sec
+    # 40mL/min, 0.667 mL/sec, tm = 2.65 sec
     # 30mL/min, 0.5 mL/sec, tm = 3.72 sec
-    # 20mL/min, 0.833 mL/sec, tm = 6.8 sec
-    # 10mL/min, 0.833 mL/sec, tm = 12.9 sec
+    # 20mL/min, 0.333 mL/sec, tm = 6.8 sec
+    # 10mL/min, 0.167 mL/sec, tm = 12.9 sec
 
     # Median exit times (i.e., exit time for STOPPED FLOW, supposed to account for pump
     # acceleration/deceleration) needed to determine collection valve timing
     # Updated 01.04.2022
 
     # 50mL/min, 0.833 mL/sec, tmed = 12.4 sec
-    # 40mL/min, 0.5 mL/sec, tmed =  14.2
+    # 40mL/min, 0.667 mL/sec, tmed =  14.2
     # 30mL/min, 0.5 mL/sec, tmed = 17.6 sec (not updated, using 18.2 as guess)
-    # 20mL/min, 0.5 mL/sec, tmed = 25.5 (not updated)
-    # 10mL/min, 0.5 mL/sec, tmed = 49 sec (not updated)
-
-    if True:
-        print("stopped flow")
-        for i in range(65):
-            print(i)
-        return
-
-    # define variables to determine collection window rxn time, and pump timing
-    mean_residence_time = 6.8
-    median_exit_time = 25.5
-    pall_flow_rates = 20
-
-    p1_rxn_delay = 300
-    p2_rxn_delay = 300
-    p3_rxn_delay = 300
-
-    flow_rates = pall_flow_rates / 60
+    # 20mL/min, 0.333 mL/sec, tmed = 25.5 (not updated)
+    # 10mL/min, 0.167 mL/sec, tmed = 49 sec (not updated)
     Vsl = 1.94
     Veq = 0.715
     Vrxnzone = 9.975
     Vexit = 0.393
     Veq_quench = 1.2
+
+    # define variables to determine collection window rxn time, and pump timing
+    mean_residence_time = 3.72
+    median_exit_time = 17.6
+    pall_flow_rates = flow_rate  #mL/min
+    flow_rates = pall_flow_rates / 60  #mL/sec
+    
+    cont_flow_residence_t = (Vrxnzone/(2*flow_rates)) #sec
+    rxn_delay = reaction_time - cont_flow_residence_t
+    print("Reaction delay:  " + str(round(rxn_delay, 5)) + " sec")
+    
+    p1_rxn_delay = rxn_delay
+    p2_rxn_delay = rxn_delay
+    p3_rxn_delay = rxn_delay
+
 
     # Pump parameters for rxn. Different than continuous flow because middle of plug needs to be stopped in middle of rxn zone.
     # rxn injection volumes are calculated as (middle of plug + equlibration loop + 1/4 rxn zone volume). the last term

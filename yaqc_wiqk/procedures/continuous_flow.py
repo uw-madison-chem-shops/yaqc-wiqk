@@ -8,21 +8,14 @@ def run(flow_rate):
 
     # Median exit times (i.e., exit time for CONTINUOUS FLOW) needed to determine collection valve timing
     # 50mL/min, 0.833 mL/sec, tmed = 10.6 sec
-    # 40mL/min, 0.5 mL/sec, tmed =  12.8 sec
-    # 30mL/min, 1.0 mL/sec, tmed = 16.8 sec
-    # 20mL/min, xx mL/sec, tmed = 24.6 sec
-    # 10mL/min, xx mL/sec, tmed = 48.2
-
-    if True:
-        print("continuous flow", flow_rate)
-        for i in range(11):
-            print(i)
-            time.sleep(1)
-        return
+    # 40mL/min, 0.667 mL/sec, tmed =  12.8 sec
+    # 30mL/min, 0.5 mL/sec, tmed = 16.8 sec
+    # 20mL/min, 0.333 mL/sec, tmed = 24.6 sec
+    # 10mL/min, 0.167 mL/sec, tmed = 48.2
 
     # define variables to determine collection window
     median_exit_time = 16.8
-    flow_rates = flow_rate
+    flow_rates = (flow_rate/60)
     Vsl = 1.94
     Veq = 0.715
     Vrxnzone = 9.975
@@ -119,9 +112,7 @@ def run(flow_rate):
     p2.add_step(volume=p2_refill_vol, rate=pall_refill_rates, delay=round(p2_refill_delay))
 
     p3.add_step(volume=p3_rxn_inj, rate=pall_flow_rates, delay=quench_delay)
-    p3.add_step(
-        volume=p3_flush_inj, rate=pall_flush_rates, delay=round((pump_flush_delay - quench_delay))
-    )
+    p3.add_step(volume=p3_flush_inj, rate=pall_flush_rates, delay=round((pump_flush_delay - quench_delay)))
     p3.add_step(volume=p3_refill_vol, rate=pall_refill_rates, delay=round(p3_refill_delay))
 
     start_pumps(1, 2, 4)

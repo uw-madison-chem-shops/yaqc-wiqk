@@ -1,5 +1,6 @@
 # flush
 
+
 import time
 import yaqc
 
@@ -8,13 +9,7 @@ from .._pump import *
 
 def run():
     # Flush
-    # (all volumes in mL unless specified differently)
-
-    if True:
-        print("flush")
-        for i in range(65):
-            print(i)
-        return
+    # (all volumes in mL unless specified differently
 
     # pall_flow_rates is the flow rate of one DSP
 
@@ -82,24 +77,24 @@ def run():
 
     assert valve0.get_identifier() == "B"
     # Prompt the User (y/n)
-    def yes_or_no(question):
-        answer = input(question + "(y/n): ").lower().strip()
-        print("")
-        while not (answer == "y" or answer == "yes" or answer == "n" or answer == "no"):
-            print("Input yes or no")
-            answer = input(question + "(y/n):").lower().strip()
-            print("")
-        if answer[0] == "y":
-            return True
-        else:
-            return False
+    # def yes_or_no(question):
+        # answer = input(question + "(y/n): ").lower().strip()
+        # print("")
+        # while not (answer == "y" or answer == "yes" or answer == "n" or answer == "no"):
+            # print("Input yes or no")
+            # answer = input(question + "(y/n):").lower().strip()
+            # print("")
+        # if answer[0] == "y":
+            # return True
+        # else:
+            # return False
 
-    if yes_or_no("Are you sure you want to FLUSH the reactor?"):
-        print("Starting Flush")
-    else:
-        print("Flush Stopped")
-        exit()
-        print("Error")  # checking exit()
+    # if yes_or_no("Are you sure you want to FLUSH the reactor?"):
+        # print("Starting Flush")
+    # else:
+        # print("Flush Stopped")
+        # exit()
+        # print("Error")  # checking exit()
 
     # Pump instructions for reaction, flush, and refill (Cat & Mon the same)
     p1.add_step(volume=pall_rxn_inj, rate=pall_flow_rates, delay=0)

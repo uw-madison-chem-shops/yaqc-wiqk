@@ -11,12 +11,6 @@ def run():
     # Refill DSPs
     # (all volumes in mL unless specified differently)
 
-    if True:
-        print("refill")
-        for i in range(65):
-            print(i)
-        return
-
     # Reactor Volume Parameters
     Vsl = 1.94
     Veq = 0.715
@@ -40,6 +34,7 @@ def run():
     p1_refill_vol = p1_rxn_inj
     p2_refill_vol = p2_rxn_inj
     p3_refill_vol = p3_rxn_inj
+    
     # Pump Injection Volume for extra step for DSPs multi-step mode
     p1_extra_inj = 0.1
     p2_extra_inj = 0.1
@@ -69,26 +64,6 @@ def run():
     while valve3.busy():
         continue
     assert valve3.get_identifier() == "B"
-
-    # Prompt the User (y/n)
-    def yes_or_no(question):
-        answer = input(question + "(y/n): ").lower().strip()
-        print("")
-        while not (answer == "y" or answer == "yes" or answer == "n" or answer == "no"):
-            print("Input yes or no")
-            answer = input(question + "(y/n):").lower().strip()
-            print("")
-        if answer[0] == "y":
-            return True
-        else:
-            return False
-
-    if yes_or_no("Are the Chemyx Pumps in multistep mode?"):
-        print("Starting Refill")
-    else:
-        print("Cannot refill until pumps are set to multistep mode")
-        exit()
-        print("Error")  # checking exit()
 
     p1.add_step(volume=p1_refill_vol, rate=pall_refill_rates, delay=0)
     p1.add_step(volume=p1_extra_inj, rate=pall_refill_rates, delay=0)
