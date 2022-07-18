@@ -1,20 +1,24 @@
 import time
+import pathlib
+import os
 
 import numpy as np
 import tidy_headers
+
+from ._timestamp import TimeStamp
 
 
 class DataWriter(object):
     def __init__(self, main_window):
         self._main_window = main_window
 
-    def create_file(self, procedure: str, procedure_args: dict):
-        filename = TimeStamp(at=self._last_procedure_started).path + f" {procedure}.txt"
+    def create_file(self, procedure: str, procedure_args: dict, start_time: int):
+        filename = TimeStamp(at=start_time).path + f" {procedure}.txt"
         self.filepath = pathlib.Path(os.path.expanduser("~")) / "WiQK-data" / filename
         self.filepath.parent.mkdir(parents=True, exist_ok=True)
         self.filepath.touch()
         headers = {}
-        headers["timestamp"] = TimeStamp(at=self._last_procedure_started).RFC3339
+        headers["timestamp"] = TimeStamp(at=start_time).RFC3339
         headers["procedure"] = procedure
         for k, v in procedure_args.items():
             headers[k] = v.get_value()
@@ -41,4 +45,6 @@ class DataWriter(object):
         arr[6] = 5
         arr[7] = 7
         arr[8] = 9
-        np.savetxt(self.filepath, arr, delimeter="\t", newline="\n")
+        with open(self.filepath, "a") as f: 
+            np.savetxt(f, arr.T, delimiter="\t", newline="\t", fmt="%.6f")
+            f.write("\n")

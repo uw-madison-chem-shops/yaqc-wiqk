@@ -19,7 +19,6 @@ from yaqc_qtpy import QClient
 from .__version__ import __version__
 from ._procedure_runner import ProcedureRunner
 from ._data_writer import DataWriter
-from ._timestamp import TimeStamp
 from . import procedures
 from ._config import Config
 from ._valve import Valve
@@ -136,7 +135,9 @@ class MainWindow(QtWidgets.QMainWindow):
         procedure = self._procedures_enum.get_value()
         self._last_procedure_started = time.time()
         # make data file
-        self._data_writer.create_file(procedure=procedure, procedure_args=self._kwargs)
+        self._data_writer.create_file(procedure=procedure,
+                                      procedure_args=self._kwargs,
+                                      start_time = self._last_procedure_started)
         self._data_filepath_widget.set_value(str(self._data_writer.filepath))
         # start data recording
         self._poll_timer.start()
