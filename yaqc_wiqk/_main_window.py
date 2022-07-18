@@ -18,6 +18,7 @@ from yaqc_qtpy import QClient
 
 from .__version__ import __version__
 from ._procedure_runner import ProcedureRunner
+from ._data_writer import DataWriter
 from ._timestamp import TimeStamp
 from . import procedures
 from ._config import Config
@@ -42,6 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._connect_to_valves()
         self._create_main_frame()
         self._procedure_runner = ProcedureRunner(self)
+        self._data_writer = DataWriter(self)
         self._last_procedure_started = float("nan")
         self._poll_timer = QtCore.QTimer(interval=1000)  # one second
         self._poll_timer.timeout.connect(self._poll)
@@ -134,17 +136,8 @@ class MainWindow(QtWidgets.QMainWindow):
         procedure = self._procedures_enum.get_value()
         self._last_procedure_started = time.time()
         # make data file
-        filename = TimeStamp(at=self._last_procedure_started).path + f" {procedure}.txt"
-        self._data_filepath = pathlib.Path(os.path.expanduser("~")) / "WiQK-data" / filename
-        self._data_filepath.parent.mkdir(parents=True, exist_ok=True)
-        self._data_filepath.touch()
-        headers = {}
-        headers["timestamp"] = TimeStamp(at=self._last_procedure_started).RFC3339
-        headers["procedure"] = procedure
-        for k, v in self._kwargs.items():
-            headers[k] = v.get_value()
-        tidy_headers.write(self._data_filepath, headers)
-        self._data_filepath_widget.set_value(str(self._data_filepath))
+        self._data_writer.create_file(procedure=procedure, procedure_args=self._kwargs)
+        self._data_filepath_widget.set_value(str(self._data_writer.filepath))
         # start data recording
         self._poll_timer.start()
         # launch procedure
@@ -158,3 +151,4 @@ class MainWindow(QtWidgets.QMainWindow):
         seconds = str(round(seconds)).zfill(2)
         self._time_elapsed_widget.set_value(f"{minutes}:{seconds}")
         print("poll")
+        self._data_writer.write()
